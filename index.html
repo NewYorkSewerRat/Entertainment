@@ -126,10 +126,10 @@ h1 span{color:var(--gold);font-style:italic;}
 
 <div class="stats-bar">
   <div class="stat-item"><span class="stat-num" id="st-total">0</span><span class="stat-lbl">Total</span></div>
-  <div class="stat-item"><span class="stat-num" id="st-inprogress">0</span><span class="stat-lbl">In Progress</span></div>
+  <div class="stat-item"><span class="stat-num" id="st-inprogress">0</span><span class="stat-lbl" id="lbl-inprogress">Watching</span></div>
   <div class="stat-item"><span class="stat-num" id="st-completed">0</span><span class="stat-lbl">Completed</span></div>
-  <div class="stat-item"><span class="stat-num" id="st-onhold">0</span><span class="stat-lbl">On Hold</span></div>
-  <div class="stat-item"><span class="stat-num" id="st-backlog">0</span><span class="stat-lbl">Backlog</span></div>
+  <div class="stat-item"><span class="stat-num" id="st-onhold">0</span><span class="stat-lbl" id="lbl-onhold">On Hold</span></div>
+  <div class="stat-item"><span class="stat-num" id="st-backlog">0</span><span class="stat-lbl" id="lbl-backlog">Backlog</span></div>
   <div class="stat-item"><span class="stat-num" id="st-dropped">0</span><span class="stat-lbl">Dropped</span></div>
 </div>
 
@@ -358,13 +358,21 @@ document.getElementById('rating-input').addEventListener('mouseleave',function()
 function updateRatingStars(val){document.querySelectorAll('.rating-star').forEach(function(s){s.classList.toggle('filled',parseInt(s.getAttribute('data-v'))<=val);});}
 
 function updateStats(){
-  var all=[].concat(data.movies,data.series,data.anime,data.games);
-  document.getElementById('st-total').textContent=all.length;
-  document.getElementById('st-inprogress').textContent=all.filter(function(e){return e.status==='watching'||e.status==='playing';}).length;
-  document.getElementById('st-completed').textContent=all.filter(function(e){return e.status==='completed';}).length;
-  document.getElementById('st-onhold').textContent=all.filter(function(e){return e.status==='onhold';}).length;
-  document.getElementById('st-backlog').textContent=all.filter(function(e){return e.status==='backlog';}).length;
-  document.getElementById('st-dropped').textContent=all.filter(function(e){return e.status==='dropped';}).length;
+  var entries = data[currentTab] || [];
+  var isGames = currentTab === 'games';
+  var isMovies = currentTab === 'movies';
+
+  document.getElementById('st-total').textContent      = entries.length;
+  document.getElementById('st-inprogress').textContent = entries.filter(function(e){ return e.status==='watching'||e.status==='playing'; }).length;
+  document.getElementById('st-completed').textContent  = entries.filter(function(e){ return e.status==='completed'; }).length;
+  document.getElementById('st-onhold').textContent     = entries.filter(function(e){ return e.status==='onhold'; }).length;
+  document.getElementById('st-backlog').textContent    = entries.filter(function(e){ return e.status==='backlog'; }).length;
+  document.getElementById('st-dropped').textContent    = entries.filter(function(e){ return e.status==='dropped'; }).length;
+
+  // update labels to match section
+  document.getElementById('lbl-inprogress').textContent = isGames ? 'Playing' : 'Watching';
+  document.getElementById('lbl-backlog').textContent    = isGames ? 'Backlog' : 'Planned';
+  document.getElementById('lbl-onhold').textContent     = isMovies ? 'Planned' : 'On Hold';
 }
 
 function exportData(){
