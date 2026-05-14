@@ -251,6 +251,7 @@ function uid()  { return Date.now().toString(36)+Math.random().toString(36).slic
 
 function switchTab(cat, btn) {
   currentTab = cat;
+  currentFilter[cat] = 'all';
   document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
   document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
