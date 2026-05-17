@@ -76,12 +76,33 @@ h1 span{color:var(--gold);font-style:italic;}
 .status-badge.completed{background:rgba(76,170,110,.15);color:#6dcc96;}
 .status-badge.dropped{background:rgba(201,76,76,.15);color:#e87a7a;}
 .status-badge.planned{background:rgba(201,168,76,.15);color:#e8c97a;}
-.platinum-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:20px;font-weight:600;background:linear-gradient(135deg,rgba(180,160,220,.2),rgba(220,180,255,.15));border:1px solid rgba(180,160,255,.4);color:#c8a8ff;}
+.platinum-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:20px;font-weight:600;background:linear-gradient(135deg,rgba(180,130,255,.25),rgba(255,200,80,.15));border:1px solid rgba(220,180,100,.5);color:#f0c060;}
 .platinum-btn{background:none;border:1px solid var(--bg4);border-radius:20px;font-size:11px;padding:3px 10px;cursor:pointer;color:var(--text3);transition:all .2s;letter-spacing:.5px;display:inline-flex;align-items:center;gap:4px;}
-.platinum-btn:hover{border-color:rgba(180,160,255,.5);color:#c8a8ff;}
-.platinum-btn.active{background:linear-gradient(135deg,rgba(180,160,220,.2),rgba(220,180,255,.15));border-color:rgba(180,160,255,.4);color:#c8a8ff;}
-.entry-card.platinumed{box-shadow:0 0 0 1px rgba(180,160,255,.25),0 4px 20px rgba(180,160,255,.08);}
-.entry-card.platinumed::after{content:'';position:absolute;inset:0;border-radius:var(--radius);background:linear-gradient(135deg,rgba(180,160,255,.03) 0%,transparent 60%);pointer-events:none;}
+.platinum-btn:hover{border-color:rgba(220,180,100,.5);color:#f0c060;}
+.platinum-btn.active{background:linear-gradient(135deg,rgba(180,130,255,.2),rgba(255,200,80,.15));border-color:rgba(220,180,100,.5);color:#f0c060;}
+.entry-card.platinumed{
+  background:linear-gradient(145deg,#1a1030,#120d24,#1e1535) !important;
+  border-color:rgba(220,180,100,.4) !important;
+  box-shadow:0 0 0 1px rgba(220,180,100,.2), 0 4px 24px rgba(160,100,255,.15), 0 0 40px rgba(160,100,255,.06);
+}
+.entry-card.platinumed::before{
+  background:linear-gradient(to right,rgba(180,130,255,.6),rgba(255,200,80,.8),rgba(180,130,255,.6)) !important;
+  height:2px;
+}
+.entry-card.platinumed .card-title{color:#f0e8ff;}
+.entry-card.platinumed .star.filled{color:#f0c060;}
+.entry-card.platinumed .card-thoughts{color:#a090c0;border-color:rgba(180,130,255,.15);}
+.entry-card.platinumed .status-badge.completed{background:rgba(180,130,255,.2);color:#c8a8ff;border:1px solid rgba(180,130,255,.3);}
+.entry-card.platinumed .card-act-btn{background:rgba(255,255,255,.04);border-color:rgba(180,130,255,.2);}
+@keyframes plat-shimmer{0%{background-position:200% center}100%{background-position:-200% center}}
+.entry-card.platinumed .card-title{
+  background:linear-gradient(90deg,#f0e8ff,#f0c060,#c8a8ff,#f0c060,#f0e8ff);
+  background-size:200% auto;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  animation:plat-shimmer 4s linear infinite;
+}
 .status-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
 .card-rating{display:flex;gap:3px;margin-bottom:10px;}
 .star{font-size:14px;color:var(--text3);cursor:pointer;transition:color .1s;}
