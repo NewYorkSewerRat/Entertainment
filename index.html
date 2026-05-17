@@ -76,6 +76,12 @@ h1 span{color:var(--gold);font-style:italic;}
 .status-badge.completed{background:rgba(76,170,110,.15);color:#6dcc96;}
 .status-badge.dropped{background:rgba(201,76,76,.15);color:#e87a7a;}
 .status-badge.planned{background:rgba(201,168,76,.15);color:#e8c97a;}
+.platinum-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:20px;font-weight:600;background:linear-gradient(135deg,rgba(180,160,220,.2),rgba(220,180,255,.15));border:1px solid rgba(180,160,255,.4);color:#c8a8ff;}
+.platinum-btn{background:none;border:1px solid var(--bg4);border-radius:20px;font-size:11px;padding:3px 10px;cursor:pointer;color:var(--text3);transition:all .2s;letter-spacing:.5px;display:inline-flex;align-items:center;gap:4px;}
+.platinum-btn:hover{border-color:rgba(180,160,255,.5);color:#c8a8ff;}
+.platinum-btn.active{background:linear-gradient(135deg,rgba(180,160,220,.2),rgba(220,180,255,.15));border-color:rgba(180,160,255,.4);color:#c8a8ff;}
+.entry-card.platinumed{box-shadow:0 0 0 1px rgba(180,160,255,.25),0 4px 20px rgba(180,160,255,.08);}
+.entry-card.platinumed::after{content:'';position:absolute;inset:0;border-radius:var(--radius);background:linear-gradient(135deg,rgba(180,160,255,.03) 0%,transparent 60%);pointer-events:none;}
 .status-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
 .card-rating{display:flex;gap:3px;margin-bottom:10px;}
 .star{font-size:14px;color:var(--text3);cursor:pointer;transition:color .1s;}
@@ -201,6 +207,15 @@ function setSyncStatus(state,msg){
 
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
 
+async function togglePlatinum(id){
+  var entry=data.games.find(function(e){return e.id===id;});
+  if(!entry)return;
+  entry.platinum=!entry.platinum;
+  localStorage.setItem('ahmads-vault',JSON.stringify(data));
+  try{await sbFetch('/rest/v1/vault?id=eq.'+id,{method:'PATCH',body:JSON.stringify({platinum:entry.platinum})});}catch(e){}
+  renderSection('games');
+}
+
 async function loadAll(){
   setSyncStatus('loading','Loading...');
   try{
@@ -209,7 +224,7 @@ async function loadAll(){
     var rows=await res.json();
     data={movies:[],series:[],anime:[],games:[]};
     rows.forEach(function(r){
-      if(data[r.cat]!==undefined) data[r.cat].push({id:r.id,title:r.title,status:r.status,rating:r.rating||0,thoughts:r.thoughts||''});
+      if(data[r.cat]!==undefined) data[r.cat].push({id:r.id,title:r.title,status:r.status,rating:r.rating||0,thoughts:r.thoughts||'',platinum:r.platinum||false});
     });
     setSyncStatus('ok','Synced');
     renderSection(currentTab);
@@ -223,7 +238,8 @@ async function saveEntry(){
   var cat=document.getElementById('edit-cat').value;
   var title=document.getElementById('f-title').value.trim();
   if(!title){document.getElementById('f-title').focus();return;}
-  var entry={id:editingId||uid(),cat:cat,title:title,status:document.getElementById('f-status').value,rating:editRating,thoughts:document.getElementById('f-thoughts').value.trim()};
+  var existing=editingId?data[cat].find(function(e){return e.id===editingId;}):null;
+  var entry={id:editingId||uid(),cat:cat,title:title,status:document.getElementById('f-status').value,rating:editRating,thoughts:document.getElementById('f-thoughts').value.trim(),platinum:existing?existing.platinum||false:false};
   setSyncStatus('loading','Saving...');
   try{
     if(editingId){
@@ -310,12 +326,17 @@ function renderCard(e,cat){
   var stars='';
   for(var i=1;i<=5;i++) stars+='<span class="star'+(i<=e.rating?' filled':'')+'" onclick="quickRate(\''+cat+'\',\''+e.id+'\','+i+')">★</span>';
   var label=ALL_STATUS_LABELS[e.status]||e.status;
-  return '<div class="entry-card '+e.status+'">'
+  var isPlatinum=e.platinum&&cat==='games';
+  return '<div class="entry-card '+e.status+(isPlatinum?' platinumed':'')+'">'
     +'<div class="card-top"><div class="card-title">'+esc(e.title)+'</div>'
     +'<div class="card-actions"><button class="card-act-btn" onclick="openModal(\''+cat+'\',\''+e.id+'\')">✎</button>'
     +'<button class="card-act-btn del" onclick="deleteEntry(\''+cat+'\',\''+e.id+'\')">✕</button></div></div>'
-    +'<div class="status-badge '+e.status+'"><span class="status-dot"></span>'+label+'</div>'
+    +'<div class="card-meta" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;">'
+    +'<span class="status-badge '+e.status+'"><span class="status-dot"></span>'+label+'</span>'
+    +(isPlatinum?'<span class="platinum-badge">🏆 Platinum</span>':'')
+    +'</div>'
     +'<div class="card-rating">'+stars+'</div>'
+    +(cat==='games'&&e.status==='completed'?'<button class="platinum-btn'+(isPlatinum?' active':'')+'" onclick="togglePlatinum(\''+e.id+'\')" style="margin-bottom:8px;">'+(isPlatinum?'🏆 Platinumed':'🏆 Mark Platinum')+'</button>':'')
     +(e.thoughts?'<div class="card-thoughts">'+esc(e.thoughts)+'</div>':'')
     +'</div>';
 }
