@@ -63,8 +63,8 @@ h1 span{color:var(--gold);font-style:italic;}
 .entry-card:hover{border-color:var(--gold-border);transform:translateY(-2px);}
 .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px;}
 .card-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--text);line-height:1.2;flex:1;}
-.card-actions{display:flex;gap:4px;opacity:0;transition:opacity .2s;}
-.entry-card:hover .card-actions{opacity:1;}
+.card-actions{display:flex;gap:4px;transition:opacity .2s;}
+
 .card-act-btn{background:var(--bg3);border:1px solid var(--bg4);color:var(--text3);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
 .card-act-btn:hover{border-color:var(--gold-border);color:var(--gold);}
 .card-act-btn.del:hover{border-color:rgba(201,76,76,.4);color:#e87a7a;}
@@ -233,7 +233,7 @@ async function togglePlatinum(id){
   if(!entry)return;
   entry.platinum=!entry.platinum;
   localStorage.setItem('ahmads-vault',JSON.stringify(data));
-  try{await sbFetch('/rest/v1/vault?id=eq.'+id,{method:'PATCH',body:JSON.stringify({platinum:entry.platinum})});}catch(e){}
+  try{sbFetch('/rest/v1/vault?id=eq.'+id,{method:'PATCH',body:JSON.stringify({platinum:entry.platinum})}).catch(function(){});}catch(e){}
   renderSection('games');
 }
 
@@ -264,11 +264,11 @@ async function saveEntry(){
   setSyncStatus('loading','Saving...');
   try{
     if(editingId){
-      await sbFetch('/rest/v1/vault?id=eq.'+editingId,{method:'PATCH',body:JSON.stringify({title:entry.title,status:entry.status,rating:entry.rating,thoughts:entry.thoughts})});
+      sbFetch('/rest/v1/vault?id=eq.'+editingId,{method:'PATCH',body:JSON.stringify({title:entry.title,status:entry.status,rating:entry.rating,thoughts:entry.thoughts})});
       var idx=data[cat].findIndex(function(e){return e.id===editingId;});
       if(idx>-1)data[cat][idx]=entry;
     }else{
-      await sbFetch('/rest/v1/vault',{method:'POST',body:JSON.stringify({id:entry.id,cat:entry.cat,title:entry.title,status:entry.status,rating:entry.rating,thoughts:entry.thoughts,platinum:entry.platinum})});
+      sbFetch('/rest/v1/vault',{method:'POST',body:JSON.stringify({id:entry.id,cat:entry.cat,title:entry.title,status:entry.status,rating:entry.rating,thoughts:entry.thoughts,platinum:entry.platinum})});
       data[cat].unshift(entry);
     }
     setSyncStatus('ok','Saved ✓');
@@ -285,7 +285,7 @@ async function saveEntry(){
 async function deleteEntry(cat,id){
   setSyncStatus('loading','Deleting...');
   try{
-    await sbFetch('/rest/v1/vault?id=eq.'+id,{method:'DELETE'});
+    sbFetch('/rest/v1/vault?id=eq.'+id,{method:'DELETE'});
     setSyncStatus('ok','Synced');
   }catch(e){setSyncStatus('err','Offline');}
   data[cat]=data[cat].filter(function(e){return e.id!==id;});
@@ -298,7 +298,7 @@ async function quickRate(cat,id,r){
   if(!e)return;
   e.rating=r;
   localStorage.setItem('ahmads-vault',JSON.stringify(data));
-  try{await sbFetch('/rest/v1/vault?id=eq.'+id,{method:'PATCH',body:JSON.stringify({rating:r})});}catch(ex){}
+  try{sbFetch('/rest/v1/vault?id=eq.'+id,{method:'PATCH',body:JSON.stringify({rating:r})}).catch(function(){});}catch(ex){}
   renderSection(cat);
 }
 
@@ -436,7 +436,7 @@ function importData(event){
         });
         setSyncStatus('loading','Importing...');
         for(var i=0;i<all.length;i++){
-          try{await sbFetch('/rest/v1/vault',{method:'POST',body:JSON.stringify(all[i])});}catch(ex){}
+          sbFetch('/rest/v1/vault',{method:'POST',body:JSON.stringify(all[i])}).catch(function(){});
         }
         await loadAll();
       }
