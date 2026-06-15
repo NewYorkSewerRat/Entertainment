@@ -133,6 +133,44 @@ h1 span{color:var(--gold);font-style:italic;}
 .btn-cancel{background:var(--bg3);border:1px solid var(--bg4);color:var(--text2);font-family:'Outfit',sans-serif;font-size:14px;padding:11px 20px;border-radius:8px;cursor:pointer;transition:all .2s;}
 .btn-cancel:hover{border-color:var(--gold-border);color:var(--text);}
 ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+
+/* AVN */
+.entry-card.pauseddev::before{background:linear-gradient(to right,transparent,#a855f7,transparent);}
+.status-badge.pauseddev{background:rgba(168,85,247,.15);color:#c084fc;}
+.pill.pauseddev{background:rgba(168,85,247,.12);border-color:rgba(168,85,247,.3);color:#c084fc;}
+.tab-btn.t-avn.active{background:rgba(168,85,247,.15);border-color:#a855f7;color:#c084fc;}
+.avn-badge{font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(168,85,247,.12);color:#c084fc;border:1px solid rgba(168,85,247,.25);}
+
+/* AVN STATS BAR */
+.avn-stats-bar{display:none;flex-direction:column;gap:0;max-width:680px;margin:0 auto 16px;border:1px solid rgba(168,85,247,.25);border-radius:var(--radius);overflow:hidden;background:var(--bg2);}
+.avn-stats-bar.visible{display:flex;}
+.avn-stats-row{display:flex;}
+.avn-stat-item{flex:1;text-align:center;padding:12px 8px;border-right:1px solid rgba(168,85,247,.15);}
+.avn-stat-item:last-child{border-right:none;}
+.avn-stat-num{display:block;font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:#c084fc;line-height:1;}
+.avn-stat-lbl{display:block;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:3px;}
+
+/* LOCK BUTTON */
+.lock-btn{position:fixed;bottom:24px;left:20px;width:44px;height:44px;border-radius:50%;background:var(--bg2);border:1px solid var(--bg4);color:var(--text3);font-size:18px;cursor:pointer;z-index:50;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 4px 16px rgba(0,0,0,.3);}
+.lock-btn:hover{border-color:rgba(168,85,247,.4);color:#c084fc;}
+.lock-btn.unlocked{border-color:rgba(168,85,247,.4);color:#c084fc;background:rgba(168,85,247,.1);}
+
+/* PIN MODAL */
+.pin-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.92);backdrop-filter:blur(8px);align-items:center;justify-content:center;}
+.pin-overlay.open{display:flex;}
+.pin-modal{background:var(--bg2);border:1px solid rgba(168,85,247,.3);border-radius:16px;padding:32px 28px;width:100%;max-width:320px;text-align:center;}
+.pin-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:#c084fc;margin-bottom:6px;}
+.pin-subtitle{font-size:12px;color:var(--text2);margin-bottom:24px;letter-spacing:.5px;}
+.pin-dots{display:flex;justify-content:center;gap:12px;margin-bottom:24px;}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(168,85,247,.4);background:transparent;transition:all .15s;}
+.pin-dot.filled{background:#a855f7;border-color:#a855f7;}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.pin-btn{background:var(--bg3);border:1px solid var(--bg4);color:var(--text);font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;padding:14px;border-radius:10px;cursor:pointer;transition:all .15s;}
+.pin-btn:hover{background:var(--bg4);border-color:rgba(168,85,247,.3);}
+.pin-btn:active{transform:scale(.94);}
+.pin-btn.del{font-size:16px;font-family:'Outfit',sans-serif;}
+.pin-btn.wide{grid-column:span 3;font-size:14px;font-family:'Outfit',sans-serif;letter-spacing:1px;text-transform:uppercase;font-weight:400;}
+.pin-error{font-size:12px;color:var(--red);margin-top:12px;min-height:18px;}
 </style>
 </head>
 <body>
@@ -151,7 +189,7 @@ h1 span{color:var(--gold);font-style:italic;}
   </div>
 </div>
 
-<div class="stats-bar">
+<div class="stats-bar" id="main-stats-bar">
   <div class="stat-item"><span class="stat-num" id="st-total">0</span><span class="stat-lbl">Total</span></div>
   <div class="stat-item"><span class="stat-num" id="st-inprogress">0</span><span class="stat-lbl" id="lbl-inprogress">Watching</span></div>
   <div class="stat-item"><span class="stat-num" id="st-completed">0</span><span class="stat-lbl">Completed</span></div>
@@ -160,11 +198,23 @@ h1 span{color:var(--gold);font-style:italic;}
   <div class="stat-item"><span class="stat-num" id="st-dropped">0</span><span class="stat-lbl">Dropped</span></div>
 </div>
 
+<!-- AVN SEPARATE STATS -->
+<div class="avn-stats-bar" id="avn-stats-bar">
+  <div class="avn-stats-row">
+    <div class="avn-stat-item"><span class="avn-stat-num" id="avn-st-total">0</span><span class="avn-stat-lbl">Total</span></div>
+    <div class="avn-stat-item"><span class="avn-stat-num" id="avn-st-playing">0</span><span class="avn-stat-lbl">Playing</span></div>
+    <div class="avn-stat-item"><span class="avn-stat-num" id="avn-st-completed">0</span><span class="avn-stat-lbl">Completed</span></div>
+    <div class="avn-stat-item"><span class="avn-stat-num" id="avn-st-dev">0</span><span class="avn-stat-lbl">In Dev</span></div>
+    <div class="avn-stat-item"><span class="avn-stat-num" id="avn-st-planned">0</span><span class="avn-stat-lbl">Planned</span></div>
+  </div>
+</div>
+
 <div class="tabs-wrap">
   <button class="tab-btn active" onclick="switchTab('movies',this)"><span>🎬</span> Movies</button>
   <button class="tab-btn" onclick="switchTab('series',this)"><span>📺</span> Series</button>
   <button class="tab-btn" onclick="switchTab('anime',this)"><span>⛩️</span> Anime</button>
   <button class="tab-btn" onclick="switchTab('games',this)"><span>🎮</span> Games</button>
+  <button class="tab-btn t-avn" id="avn-tab-btn" style="display:none;" onclick="switchTab('avn',this)"><span>🔞</span> AVN</button>
 </div>
 
 <div class="main">
@@ -172,6 +222,39 @@ h1 span{color:var(--gold);font-style:italic;}
   <div id="sec-series" class="section"></div>
   <div id="sec-anime" class="section"></div>
   <div id="sec-games" class="section"></div>
+  <div id="sec-avn" class="section"></div>
+</div>
+
+<!-- LOCK BUTTON -->
+<button class="lock-btn" id="lock-btn" onclick="handleLock()" title="AVN Section">🔒</button>
+
+<!-- PIN MODAL -->
+<div class="pin-overlay" id="pin-overlay">
+  <div class="pin-modal">
+    <p class="pin-title" id="pin-title">Enter PIN</p>
+    <p class="pin-subtitle" id="pin-subtitle">Enter your 4-digit PIN to access AVN</p>
+    <div class="pin-dots" id="pin-dots">
+      <div class="pin-dot" id="pd0"></div>
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-grid">
+      <button class="pin-btn" onclick="pinInput('1')">1</button>
+      <button class="pin-btn" onclick="pinInput('2')">2</button>
+      <button class="pin-btn" onclick="pinInput('3')">3</button>
+      <button class="pin-btn" onclick="pinInput('4')">4</button>
+      <button class="pin-btn" onclick="pinInput('5')">5</button>
+      <button class="pin-btn" onclick="pinInput('6')">6</button>
+      <button class="pin-btn" onclick="pinInput('7')">7</button>
+      <button class="pin-btn" onclick="pinInput('8')">8</button>
+      <button class="pin-btn" onclick="pinInput('9')">9</button>
+      <button class="pin-btn" onclick="pinInput('0')" style="grid-column:2;">0</button>
+      <button class="pin-btn del" onclick="pinDel()">⌫</button>
+      <button class="pin-btn wide" onclick="closePinModal()">Cancel</button>
+    </div>
+    <div class="pin-error" id="pin-error"></div>
+  </div>
 </div>
 
 <div class="modal-overlay" id="modal-overlay">
@@ -194,6 +277,69 @@ h1 span{color:var(--gold);font-style:italic;}
   </div>
 </div>
 
+<!-- AVN MODAL -->
+<div class="modal-overlay" id="avn-modal-overlay">
+  <div class="modal" style="max-width:480px;">
+    <p class="modal-title" style="color:#c084fc;" id="avn-modal-title">Add AVN</p>
+    <input type="hidden" id="avn-edit-id"/>
+    <div class="form-group"><label class="form-label">Title</label><input class="form-input" id="avn-title" type="text" placeholder="AVN title..."/></div>
+    <div class="form-group"><label class="form-label">Developer</label><input class="form-input" id="avn-dev" type="text" placeholder="e.g. DPC, Lewdlab..."/></div>
+    <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="avn-status">
+          <option value="playing">Playing</option>
+          <option value="pauseddev">Paused — In Dev</option>
+          <option value="completed">Completed</option>
+          <option value="onhold">On Hold</option>
+          <option value="dropped">Dropped</option>
+          <option value="planned">Plan to Play</option>
+          <option value="backlog">Backlog</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Platform</label>
+        <select class="form-select" id="avn-platform">
+          <option value="Itch.io">Itch.io</option>
+          <option value="Patreon">Patreon</option>
+          <option value="Steam">Steam</option>
+          <option value="F95Zone">F95Zone</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="form-group">
+        <label class="form-label">Version Played</label>
+        <input class="form-input" id="avn-version" type="text" placeholder="e.g. v0.12.1"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Steam Status</label>
+        <select class="form-select" id="avn-steam">
+          <option value="Not on Steam">Not on Steam</option>
+          <option value="On Steam">On Steam</option>
+          <option value="Wishlist">On Wishlist</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Rating</label>
+      <div class="rating-input" id="avn-rating-input">
+        <span class="avn-rating-star" data-v="1">★</span>
+        <span class="avn-rating-star" data-v="2">★</span>
+        <span class="avn-rating-star" data-v="3">★</span>
+        <span class="avn-rating-star" data-v="4">★</span>
+        <span class="avn-rating-star" data-v="5">★</span>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Thoughts / Notes</label><textarea class="form-textarea" id="avn-thoughts" placeholder="What do you think of it? Story, art, etc..."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeAvnModal()">Cancel</button>
+      <button class="btn-save" style="background:rgba(168,85,247,.15);border-color:#a855f7;color:#c084fc;" onclick="saveAvnEntry()">Save</button>
+    </div>
+  </div>
+</div>
+
 <script>
 var SB_URL = 'https://oludgjpyrennjfkizmas.supabase.co';
 var SB_KEY = 'sb_publishable_iPOfDAFeSbuFD95Ibnr05w_U9fQHHvJ';
@@ -204,20 +350,24 @@ function sbFetch(path, opts){
   }, opts));
 }
 
-var data={movies:[],series:[],anime:[],games:[]};
+var data={movies:[],series:[],anime:[],games:[],avn:[]};
 var currentTab='movies';
-var currentFilter={movies:'all',series:'all',anime:'all',games:'all'};
+var currentFilter={movies:'all',series:'all',anime:'all',games:'all',avn:'all'};
 var editRating=0;
 var editingId=null;
+var avnUnlocked=false;
+var avnRating=0;
+var avnEditingId=null;
 
 var STATUSES={
   movies:[{k:'watching',l:'Watching'},{k:'completed',l:'Completed'},{k:'dropped',l:'Dropped'},{k:'planned',l:'Plan to Watch'}],
   series:[{k:'watching',l:'Watching'},{k:'onhold',l:'On Hold'},{k:'completed',l:'Completed'},{k:'dropped',l:'Dropped'},{k:'planned',l:'Plan to Watch'}],
   anime:[{k:'watching',l:'Watching'},{k:'onhold',l:'On Hold'},{k:'completed',l:'Completed'},{k:'dropped',l:'Dropped'},{k:'planned',l:'Plan to Watch'}],
-  games:[{k:'playing',l:'Playing'},{k:'backlog',l:'Backlog'},{k:'onhold',l:'On Hold'},{k:'completed',l:'Completed'},{k:'dropped',l:'Dropped'},{k:'planned',l:'Plan to Play'}]
+  games:[{k:'playing',l:'Playing'},{k:'backlog',l:'Backlog'},{k:'onhold',l:'On Hold'},{k:'completed',l:'Completed'},{k:'dropped',l:'Dropped'},{k:'planned',l:'Plan to Play'}],
+  avn:[{k:'playing',l:'Playing'},{k:'pauseddev',l:'Paused — In Dev'},{k:'completed',l:'Completed'},{k:'onhold',l:'On Hold'},{k:'dropped',l:'Dropped'},{k:'planned',l:'Plan to Play'},{k:'backlog',l:'Backlog'}]
 };
-var ALL_STATUS_LABELS={watching:'Watching',playing:'Playing',onhold:'On Hold',backlog:'Backlog',completed:'Completed',dropped:'Dropped',planned:'Planned'};
-var tabIcons={movies:'🎬',series:'📺',anime:'⛩️',games:'🎮'};
+var ALL_STATUS_LABELS={watching:'Watching',playing:'Playing',onhold:'On Hold',backlog:'Backlog',completed:'Completed',dropped:'Dropped',planned:'Planned',pauseddev:'Paused — In Dev'};
+var tabIcons={movies:'🎬',series:'📺',anime:'⛩️',games:'🎮',avn:'🔞'};
 
 function setSyncStatus(state,msg){
   var dot=document.getElementById('sync-dot');
@@ -243,9 +393,18 @@ async function loadAll(){
     var res=await sbFetch('/rest/v1/vault?select=*&order=created_at.desc');
     if(!res.ok) throw new Error();
     var rows=await res.json();
-    data={movies:[],series:[],anime:[],games:[]};
+    data={movies:[],series:[],anime:[],games:[],avn:[]};
     rows.forEach(function(r){
-      if(data[r.cat]!==undefined) data[r.cat].push({id:r.id,title:r.title,status:r.status,rating:r.rating||0,thoughts:r.thoughts||'',platinum:r.platinum||false});
+      if(data[r.cat]!==undefined){
+        var entry={id:r.id,title:r.title,status:r.status,rating:r.rating||0,thoughts:r.thoughts||'',platinum:r.platinum||false};
+        if(r.cat==='avn'){
+          entry.developer=r.developer||'';
+          entry.version=r.version||'';
+          entry.platform=r.platform||'';
+          entry.steamStatus=r.steam_status||'Not on Steam';
+        }
+        data[r.cat].push(entry);
+      }
     });
     setSyncStatus('ok','Synced');
     renderSection(currentTab);
@@ -304,7 +463,7 @@ async function quickRate(cat,id,r){
 
 function switchTab(cat,btn){
   currentTab=cat;
-  currentFilter={movies:'all',series:'all',anime:'all',games:'all'};
+  currentFilter={movies:'all',series:'all',anime:'all',games:'all',avn:'all'};
   document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
   btn.classList.add('active');
   document.querySelectorAll('.section').forEach(function(s){
@@ -312,17 +471,106 @@ function switchTab(cat,btn){
     s.innerHTML='';
   });
   document.getElementById('sec-'+cat).classList.add('active');
+  // show/hide correct stats bar
+  document.getElementById('main-stats-bar').style.display=cat==='avn'?'none':'flex';
+  document.getElementById('avn-stats-bar').classList.toggle('visible',cat==='avn');
   renderSection(cat);
 }
 
-function setFilter(cat,status,el){
-  currentFilter[cat]=status;
-  el.closest('.filter-pills').querySelectorAll('.pill').forEach(function(p){p.classList.remove('active-filter');});
-  el.classList.add('active-filter');
-  renderSection(cat);
+// ---- PIN SYSTEM ----
+var pinBuffer='';
+var pinMode=''; // 'unlock', 'set', 'confirm'
+var pinFirst='';
+
+function handleLock(){
+  var stored=localStorage.getItem('avn-pin');
+  if(avnUnlocked){
+    // lock it
+    avnUnlocked=false;
+    document.getElementById('avn-tab-btn').style.display='none';
+    document.getElementById('lock-btn').classList.remove('unlocked');
+    document.getElementById('lock-btn').textContent='🔒';
+    if(currentTab==='avn') switchTab('movies',document.querySelector('.tab-btn'));
+    return;
+  }
+  if(!stored){
+    // first time — set PIN
+    pinMode='set'; pinFirst=''; pinBuffer='';
+    document.getElementById('pin-title').textContent='Set Your PIN';
+    document.getElementById('pin-subtitle').textContent='Choose a 4-digit PIN for the AVN section';
+  }else{
+    pinMode='unlock'; pinBuffer='';
+    document.getElementById('pin-title').textContent='Enter PIN';
+    document.getElementById('pin-subtitle').textContent='Enter your PIN to access AVN';
+  }
+  document.getElementById('pin-error').textContent='';
+  updatePinDots();
+  document.getElementById('pin-overlay').classList.add('open');
 }
 
+function pinInput(d){
+  if(pinBuffer.length>=4)return;
+  pinBuffer+=d;
+  updatePinDots();
+  if(pinBuffer.length===4) setTimeout(processPinSubmit,200);
+}
+
+function pinDel(){
+  pinBuffer=pinBuffer.slice(0,-1);
+  updatePinDots();
+}
+
+function updatePinDots(){
+  for(var i=0;i<4;i++){
+    document.getElementById('pd'+i).classList.toggle('filled',i<pinBuffer.length);
+  }
+}
+
+function processPinSubmit(){
+  var stored=localStorage.getItem('avn-pin');
+  if(pinMode==='unlock'){
+    if(pinBuffer===stored){
+      avnUnlocked=true;
+      document.getElementById('avn-tab-btn').style.display='flex';
+      document.getElementById('lock-btn').classList.add('unlocked');
+      document.getElementById('lock-btn').textContent='🔓';
+      closePinModal();
+    }else{
+      document.getElementById('pin-error').textContent='Incorrect PIN. Try again.';
+      pinBuffer=''; updatePinDots();
+    }
+  }else if(pinMode==='set'){
+    pinFirst=pinBuffer; pinBuffer=''; pinMode='confirm';
+    document.getElementById('pin-title').textContent='Confirm PIN';
+    document.getElementById('pin-subtitle').textContent='Enter the same PIN again to confirm';
+    document.getElementById('pin-error').textContent='';
+    updatePinDots();
+  }else if(pinMode==='confirm'){
+    if(pinBuffer===pinFirst){
+      localStorage.setItem('avn-pin',pinBuffer);
+      avnUnlocked=true;
+      document.getElementById('avn-tab-btn').style.display='flex';
+      document.getElementById('lock-btn').classList.add('unlocked');
+      document.getElementById('lock-btn').textContent='🔓';
+      closePinModal();
+    }else{
+      document.getElementById('pin-error').textContent='PINs do not match. Try again.';
+      pinBuffer=''; pinFirst=''; pinMode='set';
+      document.getElementById('pin-title').textContent='Set Your PIN';
+      document.getElementById('pin-subtitle').textContent='Choose a 4-digit PIN for the AVN section';
+      updatePinDots();
+    }
+  }
+}
+
+function closePinModal(){
+  pinBuffer=''; updatePinDots();
+  document.getElementById('pin-overlay').classList.remove('open');
+}
+
+// ---- AVN RENDER ----
 function renderSection(cat){
+  if(cat==='avn'){renderAvnSection();return;}
   var sec=document.getElementById('sec-'+cat);
   var filter=currentFilter[cat];
   var filtered=filter==='all'?data[cat]:data[cat].filter(function(e){return e.status===filter;});
@@ -335,7 +583,153 @@ function renderSection(cat){
   }else{
     filtered.forEach(function(e){html+=renderCard(e,cat);});
   }
-  html+='</div>';sec.innerHTML=html;updateStats();
+  html+='</div>';
+  sec.innerHTML=html;
+  updateStats();
+}
+
+function renderAvnSection(){
+  var sec=document.getElementById('sec-avn');
+  var filter=currentFilter['avn'];
+  var entries=data.avn||[];
+  var filtered=filter==='all'?entries:entries.filter(function(e){return e.status===filter;});
+
+  var html='<div class="filter-row"><div class="filter-pills">';
+  html+=makePill('all','All','avn',filter);
+  STATUSES.avn.forEach(function(s){html+=makePill(s.k,s.l,'avn',filter);});
+  html+='</div><button class="add-btn" style="border-color:#a855f7;color:#c084fc;background:rgba(168,85,247,.1);" onclick="openAvnModal(null)">+ Add AVN</button></div>';
+  html+='<div class="entries-grid">';
+  if(!filtered.length){
+    html+='<div class="empty-state"><div class="empty-icon">🔞</div><p>No AVNs logged yet</p></div>';
+  }else{
+    filtered.forEach(function(e){
+      var stars='';
+      for(var i=1;i<=5;i++) stars+='<span class="star'+(i<=e.rating?' filled':'')+'" onclick="quickRateAvn(\''+e.id+'\','+i+')">★</span>';
+      var label=ALL_STATUS_LABELS[e.status]||e.status;
+      html+='<div class="entry-card '+e.status+'" style="border-color:rgba(168,85,247,.15);">';
+      html+='<div class="card-top"><div class="card-title" style="color:#e8d5ff;">'+esc(e.title)+'</div>';
+      html+='<div class="card-actions"><button class="card-act-btn" onclick="openAvnModal(\''+e.id+'\')" style="border-color:rgba(168,85,247,.2);">✎</button>';
+      html+='<button class="card-act-btn del" onclick="deleteAvnEntry(\''+e.id+'\')">✕</button></div></div>';
+      html+='<div class="card-meta" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;">';
+      html+='<span class="status-badge '+e.status+'"><span class="status-dot"></span>'+label+'</span>';
+      if(e.platform) html+='<span class="avn-badge">'+esc(e.platform)+'</span>';
+      if(e.steamStatus&&e.steamStatus!=='Not on Steam') html+='<span class="avn-badge" style="color:#4ade80;border-color:rgba(74,222,128,.3);">'+esc(e.steamStatus)+'</span>';
+      html+='</div>';
+      if(e.developer) html+='<div style="font-size:11px;color:var(--text2);margin-bottom:6px;">👨‍💻 '+esc(e.developer)+'</div>';
+      if(e.version) html+='<div style="font-size:11px;color:#c084fc;margin-bottom:8px;font-family:monospace;">'+esc(e.version)+'</div>';
+      html+='<div class="card-rating">'+stars+'</div>';
+      if(e.thoughts) html+='<div class="card-thoughts">'+esc(e.thoughts)+'</div>';
+      html+='</div>';
+    });
+  }
+  html+='</div>';
+  sec.innerHTML=html;
+  updateAvnStats();
+}
+
+function updateAvnStats(){
+  var e=data.avn||[];
+  document.getElementById('avn-st-total').textContent=e.length;
+  document.getElementById('avn-st-playing').textContent=e.filter(function(x){return x.status==='playing';}).length;
+  document.getElementById('avn-st-completed').textContent=e.filter(function(x){return x.status==='completed';}).length;
+  document.getElementById('avn-st-dev').textContent=e.filter(function(x){return x.status==='pauseddev';}).length;
+  document.getElementById('avn-st-planned').textContent=e.filter(function(x){return x.status==='planned'||x.status==='backlog';}).length;
+}
+
+// ---- AVN MODAL ----
+function openAvnModal(id){
+  avnEditingId=id; avnRating=0;
+  document.getElementById('avn-edit-id').value=id||'';
+  document.getElementById('avn-modal-title').textContent=id?'Edit AVN':'Add AVN';
+  if(id){
+    var e=data.avn.find(function(x){return x.id===id;});
+    if(e){
+      document.getElementById('avn-title').value=e.title;
+      document.getElementById('avn-dev').value=e.developer||'';
+      document.getElementById('avn-status').value=e.status;
+      document.getElementById('avn-platform').value=e.platform||'Itch.io';
+      document.getElementById('avn-version').value=e.version||'';
+      document.getElementById('avn-steam').value=e.steamStatus||'Not on Steam';
+      document.getElementById('avn-thoughts').value=e.thoughts||'';
+      avnRating=e.rating||0;
+    }
+  }else{
+    ['avn-title','avn-dev','avn-version','avn-thoughts'].forEach(function(i){document.getElementById(i).value='';});
+    document.getElementById('avn-status').value='playing';
+    document.getElementById('avn-platform').value='Itch.io';
+    document.getElementById('avn-steam').value='Not on Steam';
+  }
+  updateAvnRatingStars(avnRating);
+  document.getElementById('avn-modal-overlay').classList.add('open');
+  setTimeout(function(){document.getElementById('avn-title').focus();},100);
+}
+
+function closeAvnModal(){
+  document.getElementById('avn-modal-overlay').classList.remove('open');
+  avnEditingId=null;
+}
+document.getElementById('avn-modal-overlay').addEventListener('click',function(e){if(e.target===this)closeAvnModal();});
+
+document.querySelectorAll('.avn-rating-star').forEach(function(star){
+  star.addEventListener('click',function(){avnRating=parseInt(this.getAttribute('data-v'));updateAvnRatingStars(avnRating);});
+  star.addEventListener('mouseover',function(){updateAvnRatingStars(parseInt(this.getAttribute('data-v')));});
+});
+document.getElementById('avn-rating-input').addEventListener('mouseleave',function(){updateAvnRatingStars(avnRating);});
+function updateAvnRatingStars(val){
+  document.querySelectorAll('.avn-rating-star').forEach(function(s){
+    s.classList.toggle('filled',parseInt(s.getAttribute('data-v'))<=val);
+    s.style.color=parseInt(s.getAttribute('data-v'))<=val?'var(--gold)':'var(--text3)';
+  });
+}
+
+function saveAvnEntry(){
+  var title=document.getElementById('avn-title').value.trim();
+  if(!title){document.getElementById('avn-title').focus();return;}
+  var id=avnEditingId||uid();
+  var entry={
+    id:id, title:title,
+    developer:document.getElementById('avn-dev').value.trim(),
+    status:document.getElementById('avn-status').value,
+    platform:document.getElementById('avn-platform').value,
+    version:document.getElementById('avn-version').value.trim(),
+    steamStatus:document.getElementById('avn-steam').value,
+    rating:avnRating,
+    thoughts:document.getElementById('avn-thoughts').value.trim()
+  };
+  if(avnEditingId){
+    var idx=data.avn.findIndex(function(x){return x.id===avnEditingId;});
+    if(idx>-1)data.avn[idx]=entry;
+    sbFetch('/rest/v1/vault?id=eq.'+avnEditingId,{method:'PATCH',body:JSON.stringify({title:entry.title,status:entry.status,rating:entry.rating,thoughts:entry.thoughts,developer:entry.developer,version:entry.version,platform:entry.platform,steam_status:entry.steamStatus})}).catch(function(){});
+  }else{
+    data.avn.unshift(entry);
+    sbFetch('/rest/v1/vault',{method:'POST',body:JSON.stringify({id:entry.id,cat:'avn',title:entry.title,status:entry.status,rating:entry.rating,thoughts:entry.thoughts,developer:entry.developer,version:entry.version,platform:entry.platform,steam_status:entry.steamStatus,platinum:false})}).catch(function(){});
+  }
+  localStorage.setItem('ahmads-vault',JSON.stringify(data));
+  closeAvnModal();renderAvnSection();
+}
+
+function deleteAvnEntry(id){
+  data.avn=data.avn.filter(function(x){return x.id!==id;});
+  localStorage.setItem('ahmads-vault',JSON.stringify(data));
+  sbFetch('/rest/v1/vault?id=eq.'+id,{method:'DELETE'}).catch(function(){});
+  renderAvnSection();
+}
+
+function quickRateAvn(id,r){
+  var e=data.avn.find(function(x){return x.id===id;});
+  if(!e)return;
+  e.rating=r;
+  localStorage.setItem('ahmads-vault',JSON.stringify(data));
+  sbFetch('/rest/v1/vault?id=eq.'+id,{method:'PATCH',body:JSON.stringify({rating:r})}).catch(function(){});
+  renderAvnSection();
+}
+
+function setFilter(cat,status,el){
+  if(cat==='avn'){currentFilter.avn=status;el.closest('.filter-pills').querySelectorAll('.pill').forEach(function(p){p.classList.remove('active-filter');});el.classList.add('active-filter');renderAvnSection();return;}
+  currentFilter[cat]=status;
+  el.closest('.filter-pills').querySelectorAll('.pill').forEach(function(p){p.classList.remove('active-filter');});
+  el.classList.add('active-filter');
+  renderSection(cat);
 }
 
 function makePill(k,l,cat,active){
