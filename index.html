@@ -744,6 +744,7 @@ function saveAvnEntry(){
 }
 
 function deleteAvnEntry(id){
+  if(!confirm('Remove this AVN entry?'))return;
   data.avn=data.avn.filter(function(x){return x.id!==id;});
   localStorage.setItem('ahmads-vault',JSON.stringify(data));
   sbFetch('/rest/v1/vault?id=eq.'+id,{method:'DELETE'}).catch(function(){});
@@ -958,6 +959,7 @@ function saveEntry(){
 }
 
 function deleteEntry(cat,id){
+  if(!confirm('Remove this entry? This cannot be undone.'))return;
   data[cat]=data[cat].filter(function(e){return e.id!==id;});
   localStorage.setItem('ahmads-vault',JSON.stringify(data));
   sbFetch('/rest/v1/vault?id=eq.'+id,{method:'DELETE'}).catch(function(){});
